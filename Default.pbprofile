@@ -1,0 +1,38 @@
+{
+  "Version": "1.0",
+  "Name": "Default",
+  "DefaultAction": "DIRECT",
+  "DnsViaProxy": true,
+  "LocalhostViaProxy": false,
+  "IsTrafficLoggingEnabled": false,
+  "AutoClearConnectionLogs": true,
+  "Language": "zh",
+  "CloseToTray": false,
+  "ProxyConfigs": [
+    {
+      "Id": 1,
+      "Name": "singbox",
+      "Type": "SOCKS5",
+      "Host": "127.0.0.1",
+      "Port": "10808",
+      "Username": "",
+      "Password": "",
+      "IsEnabled": true,
+      "UdpEnabled": true
+    }
+  ],
+  "ProxyRules": [
+    {
+      "Id": 1,
+      "Name": "anti_proxy",
+      "ProcessName": "Antigravity.exe; language_server.exe; Antigravity IDE.exe; agy.exe; language_server_windows_x64.exe",
+      "TargetHosts": "*",
+      "TargetPorts": "*",
+      "Protocol": "BOTH",
+      "Action": "PROXY",
+      "IsEnabled": true,
+      "ProxyConfigId": 1
+    }
+  ],
+  "LogFilters": []
+}
