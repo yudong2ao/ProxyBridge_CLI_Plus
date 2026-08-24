@@ -1,0 +1,5 @@
+# 压缩包文件
+*.zip
+
+# contexts 文件夹
+contexts/

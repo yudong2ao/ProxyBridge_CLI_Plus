@@ -1,0 +1,60 @@
+{
+  "Version": "1.0",
+  "Name": "Default",
+  "DefaultAction": "DIRECT",
+  "DnsViaProxy": true,
+  "LocalhostViaProxy": false,
+  "IsTrafficLoggingEnabled": false,
+  "AutoClearConnectionLogs": true,
+  "Language": "zh",
+  "CloseToTray": false,
+  "ProxyConfigs": [
+    {
+      "Id": 1,
+      "Name": "singbox",
+      "Type": "SOCKS5",
+      "Host": "127.0.0.1",
+      "Port": "10808",
+      "Username": "",
+      "Password": "",
+      "IsEnabled": true,
+      "UdpEnabled": true
+    },
+    {
+      "Id": 2,
+      "Name": "mitmproxy",
+      "Type": "HTTP",
+      "Host": "127.0.0.1",
+      "Port": "8089",
+      "Username": "",
+      "Password": "",
+      "IsEnabled": true,
+      "UdpEnabled": true
+    }
+  ],
+  "ProxyRules": [
+    {
+      "Id": 1,
+      "Name": "anti_proxy",
+      "ProcessName": "Antigravity.exe; language_server.exe; Antigravity IDE.exe; agy.exe; language_server_windows_x64.exe; node.exe; inno_updater.exe; unins000.exe; git.exe; ssh.exe; git-remote-https.exe; git-remote-http.exe",
+      "TargetHosts": "*",
+      "TargetPorts": "*",
+      "Protocol": "BOTH",
+      "Action": "PROXY",
+      "IsEnabled": true,
+      "ProxyConfigId": 1
+    },
+    {
+      "Id": 2,
+      "Name": "figma_proxy",
+      "ProcessName": "Figma.exe",
+      "TargetHosts": "*",
+      "TargetPorts": "*",
+      "Protocol": "BOTH",
+      "Action": "PROXY",
+      "IsEnabled": true,
+      "ProxyConfigId": 2
+    }
+  ],
+  "LogFilters": []
+}
