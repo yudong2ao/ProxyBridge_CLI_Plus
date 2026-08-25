@@ -29,7 +29,7 @@
       "Username": "",
       "Password": "",
       "IsEnabled": true,
-      "UdpEnabled": true
+      "UdpEnabled": false
     }
   ],
   "ProxyRules": [
@@ -50,10 +50,20 @@
       "ProcessName": "Figma.exe",
       "TargetHosts": "*",
       "TargetPorts": "*",
-      "Protocol": "BOTH",
+      "Protocol": "TCP",
       "Action": "PROXY",
       "IsEnabled": true,
       "ProxyConfigId": 2
+    },
+    {
+      "Id": 3,
+      "Name": "figma_block_quic",
+      "ProcessName": "Figma.exe",
+      "TargetHosts": "*",
+      "TargetPorts": "443",
+      "Protocol": "UDP",
+      "Action": "BLOCK",
+      "IsEnabled": true
     }
   ],
   "LogFilters": []
