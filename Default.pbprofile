@@ -35,7 +35,7 @@
       "ProxyConfigId": 1
     },
     {
-      "ProcessName": "Figma.exe;figma_agent.exe",
+      "ProcessName": "Figma.exe; figma_agent.exe",
       "TargetHosts": "*",
       "TargetPorts": "443",
       "Protocol": "UDP",
@@ -44,7 +44,7 @@
       "ProxyConfigId": 0
     },
     {
-      "ProcessName": "Figma.exe;figma_agent.exe",
+      "ProcessName": "Figma.exe; figma_agent.exe",
       "TargetHosts": "*",
       "TargetPorts": "*",
       "Protocol": "TCP",
