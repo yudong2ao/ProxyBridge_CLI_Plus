@@ -36,7 +36,7 @@
     {
       "Id": 1,
       "Name": "anti_proxy",
-      "ProcessName": "Antigravity.exe; language_server.exe; Antigravity IDE.exe; agy.exe; language_server_windows_x64.exe; node.exe; inno_updater.exe; unins000.exe; git.exe; ssh.exe; git-remote-https.exe; git-remote-http.exe",
+      "ProcessName": "Antigravity.exe; language_server.exe; Antigravity IDE.exe; agy.exe; language_server_windows_x64.exe; node.exe; cmd.exe; conhost.exe; inno_updater.exe; unins000.exe; git.exe; ssh.exe; git-remote-https.exe; git-remote-http.exe",
       "TargetHosts": "*",
       "TargetPorts": "*",
       "Protocol": "BOTH",
@@ -46,6 +46,17 @@
     },
     {
       "Id": 2,
+      "Name": "figma_block",
+      "ProcessName": "Figma.exe",
+      "TargetHosts": "*",
+      "TargetPorts": "443",
+      "Protocol": "UDP",
+      "Action": "BLOCK",
+      "IsEnabled": true,
+      "ProxyConfigId": 1
+    },
+    {
+      "Id": 3,
       "Name": "figma_proxy",
       "ProcessName": "Figma.exe",
       "TargetHosts": "*",
@@ -54,16 +65,6 @@
       "Action": "PROXY",
       "IsEnabled": true,
       "ProxyConfigId": 2
-    },
-    {
-      "Id": 3,
-      "Name": "figma_block_quic",
-      "ProcessName": "Figma.exe",
-      "TargetHosts": "*",
-      "TargetPorts": "443",
-      "Protocol": "UDP",
-      "Action": "BLOCK",
-      "IsEnabled": true
     }
   ],
   "LogFilters": []
