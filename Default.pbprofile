@@ -26,7 +26,7 @@
   ],
   "ProxyRules": [
     {
-      "ProcessName": "Antigravity.exe;language_server_windows_x64.exe;Antigravity IDE.exe;language_server.exe;agy.exe;node.exe;git.exe;ssh.exe;git-remote-https.exe;git-remote-http.exe",
+      "ProcessName": "Antigravity.exe; language_server_windows_x64.exe; Antigravity IDE.exe; language_server.exe; agy.exe; node.exe; git.exe; ssh.exe; git-remote-https.exe; git-remote-http.exe",
       "TargetHosts": "*",
       "TargetPorts": "*",
       "Protocol": "BOTH",
