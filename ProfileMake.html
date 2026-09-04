@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProxyBridge 高级配置文件生成器</title>
+    <title>ProxyBridge 配置文件生成器 (官方规范版)</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -122,6 +122,17 @@
             font-weight: normal;
         }
 
+        .badge-locked {
+            display: inline-block;
+            background: #fee2e2;
+            color: #b91c1c;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            font-weight: normal;
+        }
+
         input[type="text"],
         input[type="number"],
         input[type="password"],
@@ -153,11 +164,19 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
+        input:disabled,
+        select:disabled {
+            background-color: #e2e8f0;
+            color: #64748b;
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+        }
+
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 6px;
         }
 
         .checkbox-group input {
@@ -243,12 +262,19 @@
             position: relative;
         }
 
-        .item-row .btn-danger {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 10px;
-            font-size: 12px;
+        .item-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .item-row-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
         }
 
         .preview-box {
@@ -258,7 +284,7 @@
             border-radius: 8px;
             font-family: monospace;
             font-size: 13px;
-            max-height: 250px;
+            max-height: 280px;
             overflow-y: auto;
             white-space: pre-wrap;
             margin-top: 10px;
@@ -270,6 +296,11 @@
             margin-top: 4px;
             line-height: 1.4;
         }
+
+        .hint-locked {
+            color: #b91c1c;
+            font-weight: 500;
+        }
     </style>
 </head>
 
@@ -277,8 +308,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>⚙️ ProxyBridge 高级配置文件生成器 (V4.0.0 完整终极版)</h1>
-            <p>完整保留全量参数配置、完美兼容官方 pbprofile 结构</p>
+            <h1>⚙️ ProxyBridge 配置文件生成器</h1>
+            <p>基于官方 GUI 规范构建，自动保障格式纯净与分流规则联动</p>
         </div>
 
         <!-- 顶部快捷操作栏 -->
@@ -288,37 +319,9 @@
                 onchange="handleImportProfile(event)">
         </div>
 
-        <!-- 1. 全局高级设置 -->
+        <!-- 1. 全局配置选项 -->
         <div class="card">
-            <h2>🌐 全局与高级选项 (Global Settings)</h2>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>
-                        未匹配规则时的默认行为 (DefaultAction)
-                        <span class="badge-default">默认: DIRECT</span>
-                        <span class="badge-recommend">推荐: DIRECT</span>
-                    </label>
-                    <select id="defaultAction" onchange="update()">
-                        <option value="DIRECT" selected>DIRECT (直接连接 - 推荐，防止未知流量误走代理)</option>
-                        <option value="PROXY">PROXY (强制走默认代理)</option>
-                        <option value="BLOCK">BLOCK (阻断访问)</option>
-                    </select>
-                    <div class="hint">说明：当网络流量未触发下方任何具体规则时采取的保底动作。</div>
-                </div>
-
-                <div class="form-group">
-                    <div class="checkbox-group" style="margin-top:20px;">
-                        <input type="checkbox" id="dnsViaProxy" checked onchange="update()">
-                        <label for="dnsViaProxy">
-                            远程 DNS 解析 (DnsViaProxy)
-                            <span class="badge-default">默认: 开启</span>
-                            <span class="badge-recommend">推荐: 开启</span>
-                        </label>
-                    </div>
-                    <div class="hint">说明：强烈建议开启！开启后域名解析在代理服务端进行，彻底防止本地 DNS 污染与 DNS 隐私泄漏。</div>
-                </div>
-            </div>
-
+            <h2>🌐 全局选项 (Global Settings)</h2>
             <div class="grid-2">
                 <div class="form-group">
                     <div class="checkbox-group">
@@ -326,21 +329,50 @@
                         <label for="localhostViaProxy">
                             代理本地环回流量 (LocalhostViaProxy)
                             <span class="badge-default">默认: 关闭</span>
-                            <span class="badge-recommend">推荐: 关闭</span>
                         </label>
                     </div>
-                    <div class="hint">说明：一般保持关闭。仅当需要将访问 127.0.0.1 或 localhost 的本地请求也强行代理时才开启。</div>
+                    <div class="hint">说明：一般保持关闭。仅当需要将访问 127.0.0.1 或 localhost 的本地请求也代理时才开启。</div>
                 </div>
+
                 <div class="form-group">
                     <div class="checkbox-group">
                         <input type="checkbox" id="trafficLogging" onchange="update()">
                         <label for="trafficLogging">
-                            开启详细流量连接日志 (IsTrafficLoggingEnabled)
+                            开启流量连接日志 (IsTrafficLoggingEnabled)
                             <span class="badge-default">默认: 关闭</span>
-                            <span class="badge-recommend">推荐: 调试时开启</span>
                         </label>
                     </div>
-                    <div class="hint">说明：开启后底层会记录所有拦截的数据包日志，方便排查规则是否生效。正常使用建议关闭以提高性能。</div>
+                    <div class="hint">说明：开启后在控制台打印拦截与重定向的数据包日志，调试时使用，生产建议关闭。</div>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 8px;">
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="autoClearLogs" checked onchange="update()">
+                        <label for="autoClearLogs">
+                            自动清理连接日志 (AutoClearConnectionLogs)
+                        </label>
+                    </div>
+                    <div class="hint">说明：保持开启，定期释放历史连接日志内存。</div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="closeToTray" onchange="update()">
+                        <label for="closeToTray">
+                            关闭到托盘 (CloseToTray)
+                        </label>
+                    </div>
+                    <div class="hint">说明：GUI 模式下点击关闭是否最小化至托盘。</div>
+                </div>
+
+                <div class="form-group">
+                    <label>语言设置 (Language)</label>
+                    <select id="language" onchange="update()">
+                        <option value="zh" selected>中文 (zh)</option>
+                        <option value="en">English (en)</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -369,7 +401,7 @@
             <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                 <button class="btn btn-primary" onclick="exportProfile()"
                     style="flex: 2; padding: 12px; font-size: 16px; justify-content: center;">
-                    ⬇️ 导出配置文件
+                    ⬇️ 导出配置文件 (.pbprofile)
                 </button>
                 <button class="btn btn-secondary" onclick="copyToClipboard()" style="flex: 1; justify-content: center;">
                     📋 复制 JSON 代码
@@ -382,14 +414,16 @@
     </div>
 
     <script>
+        // 初始基础数据（保持纯净精简模版）
         let proxyConfigs = [
-            { id: 1, name: "代理节点 1", type: "SOCKS5", host: "127.0.0.1", port: "", username: "", password: "", isEnabled: true, udpEnabled: true }
+            { id: 1, type: "SOCKS5", host: "127.0.0.1", port: "10808", username: "", password: "" }
         ];
 
         let proxyRules = [
-            { id: 1, name: "分流规则 1", processName: "", targetHosts: "*", targetPorts: "*", protocol: "BOTH", action: "PROXY", proxyConfigId: 1, isEnabled: true }
+            { processName: "", targetHosts: "*", targetPorts: "*", protocol: "BOTH", action: "PROXY", isEnabled: true, proxyConfigId: 1 }
         ];
 
+        // 渲染代理节点列表
         function renderProxyConfigs() {
             const container = document.getElementById('proxyConfigsContainer');
             container.innerHTML = '';
@@ -398,36 +432,34 @@
                 const div = document.createElement('div');
                 div.className = 'item-row';
                 div.innerHTML = `
-                ${proxyConfigs.length > 1 ? `<button class="btn btn-danger" onclick="removeProxyConfig(${index})">删除</button>` : ''}
+                <div class="item-row-header">
+                    <span class="item-row-title">🔌 代理节点 #${config.id} (Id: ${config.id})</span>
+                    ${proxyConfigs.length > 1 ? `<button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="removeProxyConfig(${index})">删除节点</button>` : ''}
+                </div>
                 <div class="grid-3" style="margin-bottom:10px;">
-                    <div>
-                        <label>节点名称 (Name)</label>
-                        <input type="text" value="${config.name}" placeholder="例: 默认节点" onchange="proxyConfigs[${index}].name = this.value; update();">
-                    </div>
                     <div>
                         <label>协议类型 (Type) <span class="badge-recommend">推荐 SOCKS5</span></label>
                         <select onchange="proxyConfigs[${index}].type = this.value; update();">
-                            <option value="SOCKS5" ${config.type === 'SOCKS5' ? 'selected' : ''}>SOCKS5 (全面支持 TCP/UDP)</option>
+                            <option value="SOCKS5" ${config.type === 'SOCKS5' ? 'selected' : ''}>SOCKS5 (支持 TCP/UDP)</option>
                             <option value="HTTP" ${config.type === 'HTTP' ? 'selected' : ''}>HTTP</option>
-                            <option value="SOCKS4" ${config.type === 'SOCKS4' ? 'selected' : ''}>SOCKS4</option>
                         </select>
                     </div>
                     <div>
                         <label>主机/IP (Host)</label>
                         <input type="text" value="${config.host}" placeholder="127.0.0.1" onchange="proxyConfigs[${index}].host = this.value; update();">
                     </div>
-                </div>
-                <div class="grid-3">
                     <div>
                         <label>端口 (Port)</label>
                         <input type="text" value="${config.port}" placeholder="例: 10808" onchange="proxyConfigs[${index}].port = this.value; update();">
                     </div>
+                </div>
+                <div class="grid-2">
                     <div>
-                        <label>用户名 (Username)</label>
+                        <label>认证用户名 (Username)</label>
                         <input type="text" value="${config.username}" placeholder="无 (可选)" onchange="proxyConfigs[${index}].username = this.value; update();">
                     </div>
                     <div>
-                        <label>密码 (Password)</label>
+                        <label>认证密码 (Password)</label>
                         <input type="password" value="${config.password}" placeholder="无 (可选)" onchange="proxyConfigs[${index}].password = this.value; update();">
                     </div>
                 </div>
@@ -436,6 +468,7 @@
             });
         }
 
+        // 渲染分流规则列表
         function renderProxyRules() {
             const container = document.getElementById('proxyRulesContainer');
             container.innerHTML = '';
@@ -444,66 +477,111 @@
                 const div = document.createElement('div');
                 div.className = 'item-row';
 
-                let proxyOptions = proxyConfigs.map(c => `<option value="${c.id}" ${rule.proxyConfigId === c.id ? 'selected' : ''}>${c.name || '节点 ' + c.id} (${c.type} :${c.port || '未填'})</option>`).join('');
+                const isLockedZero = (rule.action === 'BLOCK' || rule.action === 'DIRECT');
+
+                // 节点选项
+                let proxyOptionsHtml = '';
+                if (isLockedZero) {
+                    proxyOptionsHtml = `<option value="0" selected>0 (已直连/阻断，固定为 0)</option>`;
+                } else {
+                    proxyOptionsHtml = proxyConfigs.map(c =>
+                        `<option value="${c.id}" ${rule.proxyConfigId === c.id ? 'selected' : ''}>节点 ${c.id} (${c.type} :${c.port || '未填'})</option>`
+                    ).join('');
+                }
 
                 div.innerHTML = `
-                ${proxyRules.length > 1 ? `<button class="btn btn-danger" onclick="removeProxyRule(${index})">删除</button>` : ''}
-                <div class="grid-3" style="margin-bottom:12px;">
-                    <div>
-                        <label>规则名称 (Name)</label>
-                        <input type="text" value="${rule.name}" placeholder="例: 规则 1" onchange="proxyRules[${index}].name = this.value; update();">
+                <div class="item-row-header">
+                    <span class="item-row-title">🔀 规则 #${index + 1}</span>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <label style="margin-bottom:0; display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px;">
+                            <input type="checkbox" ${rule.isEnabled !== false ? 'checked' : ''} onchange="proxyRules[${index}].isEnabled = this.checked; update();">
+                            启用此规则
+                        </label>
+                        ${proxyRules.length > 1 ? `<button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="removeProxyRule(${index})">删除规则</button>` : ''}
                     </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom:12px;">
                     <div>
-                        <label>处理动作 (Action) <span class="badge-default">默认: PROXY</span></label>
-                        <select onchange="proxyRules[${index}].action = this.value; update();">
-                            <option value="PROXY" ${rule.action === 'PROXY' ? 'selected' : ''}>PROXY (强制走代理)</option>
+                        <label>处理动作 (Action)</label>
+                        <select onchange="handleRuleActionChange(${index}, this.value)">
+                            <option value="PROXY" ${rule.action === 'PROXY' ? 'selected' : ''}>PROXY (走代理)</option>
                             <option value="DIRECT" ${rule.action === 'DIRECT' ? 'selected' : ''}>DIRECT (直连不走代理)</option>
-                            <option value="BLOCK" ${rule.action === 'BLOCK' ? 'selected' : ''}>BLOCK (完全阻断访问)</option>
+                            <option value="BLOCK" ${rule.action === 'BLOCK' ? 'selected' : ''}>BLOCK (阻断访问)</option>
                         </select>
+                        <div class="hint">规则匹配成功后采取的行为动作。</div>
                     </div>
                     <div>
-                        <label>绑定代理节点 (ProxyConfigId)</label>
-                        <select onchange="proxyRules[${index}].proxyConfigId = parseInt(this.value); update();">
-                            ${proxyOptions}
+                        <label>
+                            绑定代理节点 (ProxyConfigId)
+                            ${isLockedZero ? `<span class="badge-locked">已锁定: 0</span>` : ''}
+                        </label>
+                        <select id="ruleProxyConfig_${index}" ${isLockedZero ? 'disabled' : ''} onchange="handleRuleProxyConfigChange(${index}, this.value)">
+                            ${proxyOptionsHtml}
                         </select>
+                        <div class="hint ${isLockedZero ? 'hint-locked' : ''}">
+                            ${isLockedZero ? '🔒 动作为 DIRECT 或 BLOCK 时，ProxyConfigId 自动固定为 0，不能修改。' : '请指定流量匹配时转发的目标代理节点。'}
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                         <label style="margin-bottom:0;">
-                            进程名称 (ProcessName)
-                            <span class="badge-recommend">支持多选 / 通配符 *</span>
+                            匹配进程 (ProcessName)
+                            <span class="badge-recommend">支持分号多选 / 通配符 *</span>
                         </label>
                         <button class="btn btn-browse" onclick="triggerFilePicker(${index})">📂 浏览选择 .exe 程序...</button>
                     </div>
-                    <textarea placeholder="例如: chrome.exe; v2ray.exe (多个用分号隔开，填 * 匹配所有程序)" onchange="proxyRules[${index}].processName = this.value; update();">${rule.processName}</textarea>
+                    <textarea placeholder="例如: chrome.exe; v2ray.exe (多个用分号隔开，填 * 匹配所有程序)" onchange="proxyRules[${index}].processName = this.value; update();">${rule.processName || ''}</textarea>
                     <input type="file" id="filePicker_${index}" accept=".exe" multiple style="display:none;" onchange="handleFileSelect(event, ${index})">
-                    <div class="hint">提示：直接在框内输入进程名，或点击右侧按钮直接从资源管理器选程序追加。</div>
+                    <div class="hint">可直接输入进程名或点击右侧按钮选择文件追加。</div>
                 </div>
 
                 <div class="grid-2">
                     <div>
                         <label>目标主机/IP (TargetHosts) <span class="badge-default">默认: *</span></label>
-                        <input type="text" value="${rule.targetHosts}" placeholder="例: *.google.com; 1.1.1.1 或 *" onchange="proxyRules[${index}].targetHosts = this.value; update();">
-                        <div class="hint">匹配目标域名或 IP 地址，多个用分号隔开。</div>
+                        <input type="text" value="${rule.targetHosts || '*'}" placeholder="例: *.google.com; 1.1.1.1 或 *" onchange="proxyRules[${index}].targetHosts = this.value; update();">
+                        <div class="hint">匹配目标域名或 IP，多个用分号隔开。</div>
                     </div>
                     <div>
                         <label>目标端口与协议 (TargetPorts / Protocol)</label>
                         <div style="display:flex; gap:8px;">
-                            <input type="text" value="${rule.targetPorts}" placeholder="端口(例: 80,443 或 *)" onchange="proxyRules[${index}].targetPorts = this.value; update();" style="flex:2;">
+                            <input type="text" value="${rule.targetPorts || '*'}" placeholder="端口 (例: 80,443 或 *)" onchange="proxyRules[${index}].targetPorts = this.value; update();" style="flex:2;">
                             <select onchange="proxyRules[${index}].protocol = this.value; update();" style="flex:1.2;">
                                 <option value="BOTH" ${rule.protocol === 'BOTH' ? 'selected' : ''}>BOTH (TCP+UDP)</option>
                                 <option value="TCP" ${rule.protocol === 'TCP' ? 'selected' : ''}>TCP</option>
                                 <option value="UDP" ${rule.protocol === 'UDP' ? 'selected' : ''}>UDP</option>
                             </select>
                         </div>
-                        <div class="hint">推荐 Protocol 选择 BOTH，保障 UDP 流量正常转发。</div>
+                        <div class="hint">协议推荐 BOTH，如有针对性阻断 (如阻断 UDP 443) 请显式指定。</div>
                     </div>
                 </div>
             `;
                 container.appendChild(div);
             });
+        }
+
+        // Action 改变时联动 ProxyConfigId 逻辑
+        function handleRuleActionChange(index, newAction) {
+            proxyRules[index].action = newAction;
+            if (newAction === 'BLOCK' || newAction === 'DIRECT') {
+                proxyRules[index].proxyConfigId = 0;
+            } else if (newAction === 'PROXY') {
+                // 若原为 0，恢复为当前第一个有效节点的 ID
+                if (proxyRules[index].proxyConfigId === 0) {
+                    proxyRules[index].proxyConfigId = proxyConfigs.length > 0 ? proxyConfigs[0].id : 1;
+                }
+            }
+            update();
+        }
+
+        // 修改绑定的代理节点
+        function handleRuleProxyConfigChange(index, value) {
+            if (proxyRules[index].action === 'PROXY') {
+                proxyRules[index].proxyConfigId = parseInt(value) || 1;
+                update();
+            }
         }
 
         function triggerFilePicker(index) {
@@ -517,7 +595,7 @@
             const fileNames = Array.from(files).map(f => f.name);
             const newAppsString = fileNames.join('; ');
 
-            const currentVal = proxyRules[index].processName.trim();
+            const currentVal = (proxyRules[index].processName || '').trim();
             if (currentVal === '' || currentVal === '*') {
                 proxyRules[index].processName = newAppsString;
             } else {
@@ -541,39 +619,56 @@
                     const config = JSON.parse(e.target.result);
 
                     // 1. 读取全局配置
-                    if (config.DefaultAction) document.getElementById('defaultAction').value = config.DefaultAction;
-                    if (config.DnsViaProxy !== undefined) document.getElementById('dnsViaProxy').checked = config.DnsViaProxy;
-                    if (config.LocalhostViaProxy !== undefined) document.getElementById('localhostViaProxy').checked = config.LocalhostViaProxy;
-                    if (config.IsTrafficLoggingEnabled !== undefined) document.getElementById('trafficLogging').checked = config.IsTrafficLoggingEnabled;
+                    if (config.LocalhostViaProxy !== undefined) {
+                        document.getElementById('localhostViaProxy').checked = !!config.LocalhostViaProxy;
+                    }
+                    if (config.IsTrafficLoggingEnabled !== undefined) {
+                        document.getElementById('trafficLogging').checked = !!config.IsTrafficLoggingEnabled;
+                    }
+                    if (config.AutoClearConnectionLogs !== undefined) {
+                        document.getElementById('autoClearLogs').checked = !!config.AutoClearConnectionLogs;
+                    }
+                    if (config.CloseToTray !== undefined) {
+                        document.getElementById('closeToTray').checked = !!config.CloseToTray;
+                    }
+                    if (config.Language) {
+                        document.getElementById('language').value = config.Language;
+                    }
 
-                    // 2. 读取代理节点
+                    // 2. 读取代理节点 (严格按官方标准字段映射)
                     if (Array.isArray(config.ProxyConfigs) && config.ProxyConfigs.length > 0) {
-                        proxyConfigs = config.ProxyConfigs.map(c => ({
-                            id: c.Id || 1,
-                            name: c.Name || ("代理节点 " + (c.Id || 1)),
+                        proxyConfigs = config.ProxyConfigs.map((c, i) => ({
+                            id: c.Id !== undefined ? c.Id : (i + 1),
                             type: c.Type || "SOCKS5",
                             host: c.Host || "127.0.0.1",
                             port: String(c.Port || ""),
                             username: c.Username || "",
-                            password: c.Password || "",
-                            isEnabled: c.IsEnabled !== undefined ? c.IsEnabled : true,
-                            udpEnabled: c.UdpEnabled !== undefined ? c.UdpEnabled : true
+                            password: c.Password || ""
                         }));
                     }
 
-                    // 3. 读取规则 (兼容 Name 字段读取)
+                    // 3. 读取规则 (支持 BLOCK / DIRECT 联动固定为 0)
                     if (Array.isArray(config.ProxyRules) && config.ProxyRules.length > 0) {
-                        proxyRules = config.ProxyRules.map(r => ({
-                            id: r.Id || 1,
-                            name: r.Name || ("分流规则 " + (r.Id || 1)),
-                            processName: r.ProcessName || r.Applications || r.Processes || "",
-                            targetHosts: r.TargetHosts || "*",
-                            targetPorts: r.TargetPorts || "*",
-                            protocol: r.Protocol || "BOTH",
-                            action: r.Action || "PROXY",
-                            proxyConfigId: r.ProxyConfigId || (proxyConfigs[0] ? proxyConfigs[0].id : 1),
-                            isEnabled: r.IsEnabled !== undefined ? r.IsEnabled : true
-                        }));
+                        proxyRules = config.ProxyRules.map(r => {
+                            const action = r.Action || "PROXY";
+                            let pId = r.ProxyConfigId;
+                            if (action === 'BLOCK' || action === 'DIRECT') {
+                                pId = 0;
+                            } else {
+                                if (pId === undefined || pId === 0) {
+                                    pId = proxyConfigs.length > 0 ? proxyConfigs[0].id : 1;
+                                }
+                            }
+                            return {
+                                processName: r.ProcessName || r.Applications || r.Processes || "",
+                                targetHosts: r.TargetHosts || "*",
+                                targetPorts: r.TargetPorts || "*",
+                                protocol: r.Protocol || "BOTH",
+                                action: action,
+                                isEnabled: r.IsEnabled !== undefined ? r.IsEnabled : true,
+                                proxyConfigId: pId
+                            };
+                        });
                     }
 
                     update();
@@ -589,29 +684,33 @@
             const newId = proxyConfigs.length > 0 ? Math.max(...proxyConfigs.map(c => c.id)) + 1 : 1;
             proxyConfigs.push({
                 id: newId,
-                name: `代理节点 ${newId}`,
                 type: "SOCKS5",
                 host: "127.0.0.1",
                 port: "",
                 username: "",
-                password: "",
-                isEnabled: true,
-                udpEnabled: true
+                password: ""
             });
             update();
         }
 
         function removeProxyConfig(index) {
+            const removedId = proxyConfigs[index].id;
             proxyConfigs.splice(index, 1);
+
+            // 若有规则绑定了被删除的节点且处于 PROXY 动作，重置其绑定为当前第一个节点
+            const fallbackId = proxyConfigs.length > 0 ? proxyConfigs[0].id : 0;
+            proxyRules.forEach(r => {
+                if (r.action === 'PROXY' && r.proxyConfigId === removedId) {
+                    r.proxyConfigId = fallbackId;
+                }
+            });
+
             update();
         }
 
         function addProxyRule() {
-            const newId = proxyRules.length > 0 ? Math.max(...proxyRules.map(r => r.id)) + 1 : 1;
             const defaultProxyId = proxyConfigs.length > 0 ? proxyConfigs[0].id : 1;
             proxyRules.push({
-                id: newId,
-                name: `分流规则 ${newId}`,
                 processName: "",
                 targetHosts: "*",
                 targetPorts: "*",
@@ -628,39 +727,32 @@
             update();
         }
 
-        // 严密匹配 ProxyBridge V4.0.0 官方完整 JSON 结构（无遗漏）
+        // 构建纯净的官方标准配置对象
         function buildProfileObject() {
             return {
                 Version: "1.0",
                 Name: "Default",
-                DefaultAction: document.getElementById('defaultAction').value,
-                DnsViaProxy: document.getElementById('dnsViaProxy').checked,
                 LocalhostViaProxy: document.getElementById('localhostViaProxy').checked,
                 IsTrafficLoggingEnabled: document.getElementById('trafficLogging').checked,
-                AutoClearConnectionLogs: true,
-                Language: "zh",
-                CloseToTray: false,
+                AutoClearConnectionLogs: document.getElementById('autoClearLogs').checked,
+                Language: document.getElementById('language').value,
+                CloseToTray: document.getElementById('closeToTray').checked,
                 ProxyConfigs: proxyConfigs.map(c => ({
                     Id: c.id,
-                    Name: c.name || ("代理节点 " + c.id),
                     Type: c.type,
                     Host: c.host,
-                    Port: String(c.port || "10808"),
+                    Port: String(c.port || ""),
                     Username: c.username || "",
-                    Password: c.password || "", // 修复 bug: 纠正 c.Password 为小写 c.password
-                    IsEnabled: c.isEnabled !== undefined ? c.isEnabled : true,
-                    UdpEnabled: c.udpEnabled !== undefined ? c.udpEnabled : true
+                    Password: c.password || ""
                 })),
                 ProxyRules: proxyRules.map(r => ({
-                    Id: r.id,
-                    Name: r.name || ("分流规则 " + r.id),
                     ProcessName: r.processName || "*",
                     TargetHosts: r.targetHosts || "*",
                     TargetPorts: r.targetPorts || "*",
                     Protocol: r.protocol || "BOTH",
                     Action: r.action || "PROXY",
                     IsEnabled: r.isEnabled !== undefined ? r.isEnabled : true,
-                    ProxyConfigId: r.proxyConfigId
+                    ProxyConfigId: (r.action === 'BLOCK' || r.action === 'DIRECT') ? 0 : (r.proxyConfigId || 0)
                 })),
                 LogFilters: []
             };
@@ -688,7 +780,7 @@
             });
         }
 
-        // 初始化渲染
+        // 页面初始化渲染
         update();
     </script>
 </body>
