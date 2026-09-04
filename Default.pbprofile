@@ -1,8 +1,6 @@
 {
   "Version": "1.0",
   "Name": "Default",
-  "DefaultAction": "DIRECT",
-  "DnsViaProxy": true,
   "LocalhostViaProxy": false,
   "IsTrafficLoggingEnabled": false,
   "AutoClearConnectionLogs": true,
@@ -11,32 +9,24 @@
   "ProxyConfigs": [
     {
       "Id": 1,
-      "Name": "singbox",
       "Type": "SOCKS5",
       "Host": "127.0.0.1",
       "Port": "10808",
       "Username": "",
-      "Password": "",
-      "IsEnabled": true,
-      "UdpEnabled": true
+      "Password": ""
     },
     {
       "Id": 2,
-      "Name": "mitmproxy",
       "Type": "HTTP",
       "Host": "127.0.0.1",
       "Port": "8089",
       "Username": "",
-      "Password": "",
-      "IsEnabled": true,
-      "UdpEnabled": false
+      "Password": ""
     }
   ],
   "ProxyRules": [
     {
-      "Id": 1,
-      "Name": "anti_proxy",
-      "ProcessName": "Antigravity.exe; language_server.exe; Antigravity IDE.exe; agy.exe; language_server_windows_x64.exe; node.exe; cmd.exe; conhost.exe; inno_updater.exe; unins000.exe; git.exe; ssh.exe; git-remote-https.exe; git-remote-http.exe",
+      "ProcessName": "Antigravity.exe;language_server_windows_x64.exe;Antigravity IDE.exe;language_server.exe;agy.exe;node.exe;git.exe;ssh.exe;git-remote-https.exe;git-remote-http.exe",
       "TargetHosts": "*",
       "TargetPorts": "*",
       "Protocol": "BOTH",
@@ -45,20 +35,16 @@
       "ProxyConfigId": 1
     },
     {
-      "Id": 2,
-      "Name": "figma_block",
-      "ProcessName": "Figma.exe",
+      "ProcessName": "Figma.exe;figma_agent.exe",
       "TargetHosts": "*",
       "TargetPorts": "443",
       "Protocol": "UDP",
       "Action": "BLOCK",
       "IsEnabled": true,
-      "ProxyConfigId": 1
+      "ProxyConfigId": 0
     },
     {
-      "Id": 3,
-      "Name": "figma_proxy",
-      "ProcessName": "Figma.exe",
+      "ProcessName": "Figma.exe;figma_agent.exe",
       "TargetHosts": "*",
       "TargetPorts": "*",
       "Protocol": "TCP",
